@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Siebträger 3D-Ansicht</title>
+
+  <!-- Model Viewer einbinden -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #001122;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+      font-family: Arial, sans-serif;
+      position: relative;
+      overflow-x: hidden; /* verhindert horizontalen Scrollbalken */
+    }
+
+    model-viewer {
+      width: 100%;
+      max-width: 800px;
+      height: 600px;
+      background-color: transparent;
+    }
+
+    /* Ladeanzeige & Fallback zentriert */
+    .fallback {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 1.2rem;
+      text-align: center;
+      z-index: 10;
+    }
+
+    /* AR-Button anpassen */
+    model-viewer::part(ar-button) {
+      background-color: #ffcc00;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      bottom: 30px;
+      right: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Overlay gegen Flackern/Balken beim Laden */
+    #overlay-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #001122;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.4s ease;
+    }
+
+    #overlay-loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay mit Ladeanzeige -->
+  <div id="overlay-loader">
+    <div id="loader">🔄 Wird geladen...</div>
+  </div>
+
+  <!-- Model Viewer -->
+  <model-viewer
+    id="viewer"
+    src="siebtraeger_1.5.glb"
+    ios-src="siebtraeger_1.5.usdz"
+    ar
+    ar-modes="scene-viewer quick-look webxr"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    exposure="1"
+    environment-image="neutral"
+    alt="3D Modell eines Siebträgers"
+  >
+  </model-viewer>
+
+  <!-- Fallback-Anzeige bei Fehlern -->
+  <div class="fallback" id="fallback">
+    ⚠️ Das 3D-Modell konnte nicht geladen werden.<br />
+    Möglicherweise wird dein Browser nicht unterstützt oder die Datei fehlt.
+  </div>
+
+  <!-- Steuerung für Ladeverhalten -->
+  <script>
+    const viewer = document.getElementById('viewer');
+    const fallback = document.getElementById('fallback');
+    const overlay = document.getElementById('overlay-loader');
+
+    viewer.addEventListener('load', () => {
+      overlay.classList.add('hidden');
+    });
+
+    viewer.addEventListener('error', () => {
+      overlay.style.display = 'none';
+      fallback.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
