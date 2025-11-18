@@ -60,7 +60,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #001122;
+      background-color: #ffffff; /*---Farbe loader hintergrund---*/
       z-index: 9999;
       display: flex;
       justify-content: center;
@@ -80,7 +80,7 @@
     <div id="loader">🔄 Wird geladen...</div>
   </div>
 
-  <!-- Model Viewer -->
+  <!-- Model Viewer (kann auto-rotate beinhalten.)-->
   <model-viewer
     id="viewer"
     src="Maschine.glb"
@@ -88,7 +88,6 @@
     ar
     ar-modes="scene-viewer quick-look webxr"
     camera-controls
-    auto-rotate
     shadow-intensity="1"
     exposure="1"
     environment-image="neutral"
