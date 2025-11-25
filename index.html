@@ -42,17 +42,6 @@
       z-index: 10;
     }
 
-    /* AR-Button anpassen */
-    model-viewer::part(ar-button) {
-      background-color: #ffcc00;
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      bottom: 30px;
-      right: 30px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    }
-
     /* Overlay gegen Flackern/Balken beim Laden */
     #overlay-loader {
       position: fixed;
@@ -72,6 +61,37 @@
       opacity: 0;
       pointer-events: none;
     }
+      
+      #ar-button {
+          position: absolute;
+          bottom: 16px;
+          left: 50%;
+          transform: translateX(-50%);
+
+          padding: 12px 24px;
+          background: #0D2C57;
+          color: #ffffff;
+          font-size: 16px;
+          font-weight: 600;
+
+          border: none;
+          border-radius: 8px;
+
+          cursor: pointer;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+
+          transition: all 0.2s ease;
+      }
+
+      #ar-button:hover {
+          background: #ffcc00;
+          transform: translateX(-50%) scale(1.04);
+      }
+
+      #ar-button:active {
+          transform: translateX(-50%) scale(0.98);
+      }
+      
   </style>
 </head>
 <body>
@@ -93,6 +113,11 @@
     environment-image="neutral"
     alt="3D Modell eines Siebträgers"
   >
+  
+  <button slot="ar-button" id="ar-button">
+      👉 In AR ansehen
+  </button>
+  
   </model-viewer>
 
   <!-- Fallback-Anzeige bei Fehlern -->
