@@ -12,6 +12,7 @@
       --loader-text-color: #000000;
       --fallback-text-color: #000000;
     }
+
     body {
       margin: 0;
       background: transparent;
@@ -31,23 +32,21 @@
       background: transparent;
     }
 
-    model-viewer::part(ar-button) {
-      display: none !important;
-    }
-    button[slot="ar-button"] {
-      display: none !important;
-    }
-    model-viewer > button {
-      display: none !important;
-    }
-    .button-ar, model-viewer .ar-button, model-viewer .icon, model-viewer .quick-look-button {
+    /* Originale AR-Buttons deaktivieren */
+    model-viewer::part(ar-button),
+    button[slot="ar-button"],
+    model-viewer > button,
+    .button-ar,
+    model-viewer .ar-button,
+    model-viewer .icon,
+    model-viewer .quick-look-button {
       display: none !important;
       opacity: 0 !important;
       visibility: hidden !important;
       pointer-events: none !important;
     }
 
-    /* AR Button – standardmäßig versteckt */
+    /* Custom AR Button */
     #ar-button {
       display: none;
       position: absolute;
@@ -72,7 +71,16 @@
       transform: translateX(-50%) scale(1.04);
     }
 
-    @media (max-width: 768px) {
+    /* Mobile Custom Button */
+    @media (pointer: coarse) {
+      #ar-button {
+        bottom: 400px !important; /* höher */
+        padding: 32px 64px !important; /* größer */
+        font-size: 32px !important;
+        border-radius: 20px !important;
+        z-index: 999999 !important;
+      }
+
       model-viewer {
         width: 100vw !important;
         height: 100vh !important;
@@ -81,14 +89,6 @@
         margin: 0 !important;
         padding: 0 !important;
         display: block !important;
-      }
-
-      #ar-button {
-        bottom: 350px !important;
-        padding: 28px 56px !important;
-        font-size: 28px !important;
-        border-radius: 16px !important;
-        z-index: 999999 !important;
       }
     }
 
@@ -177,7 +177,7 @@
 
 <div id="qr-overlay">
   <div id="qr-box">
-    <h2>Scanne den QR-Code für die AR ansicht</h2>
+    <h2>Scanne den QR-Code für die AR Ansicht</h2>
     <img id="qr-image" src="">
     <br><br>
     <button onclick="qrOverlay.style.display='none'">Schließen</button>
@@ -194,12 +194,12 @@
 
   const mobileARUrl = "https://illumio3d.github.io/AR-Viewer-Machine/";
 
-  /* QR-Code generieren über stabile API */
+  /* QR-Code generieren */
   qrImage.src =
     "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
     encodeURIComponent(mobileARUrl);
 
-  /* Modell wird sichtbar → Loader entfernen & Button anzeigen */
+  /* Modell wird sichtbar → Loader entfernen & Custom Button anzeigen */
   viewer.addEventListener("model-visibility", () => {
     overlay.classList.add("hidden");
     arButton.style.display = "block";
@@ -211,8 +211,20 @@
     fallback.style.display = "block";
   });
 
+  /* Originale AR-Buttons im Shadow DOM deaktivieren */
+  viewer.addEventListener("load", () => {
+    const arElements = viewer.shadowRoot.querySelectorAll(
+      ".ar-button, .icon, .quick-look-button"
+    );
+    arElements.forEach(el => {
+      el.style.display = "none";
+      el.style.visibility = "hidden";
+      el.style.opacity = "0";
+      el.style.pointerEvents = "none";
+    });
+  });
+
   /* AR Button Logik */
-  // robust mobile detection: touch-capable device + mobile UA
   const isMobile = (() => {
     try {
       return (
