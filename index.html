@@ -40,6 +40,12 @@
     model-viewer > button {
       display: none !important;
     }
+    .button-ar, model-viewer .ar-button, model-viewer .icon, model-viewer .quick-look-button {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
 
     /* AR Button – standardmäßig versteckt */
     #ar-button {
@@ -67,18 +73,22 @@
     }
 
     @media (max-width: 768px) {
-      #ar-button {
-        bottom: 320px !important;
-        padding: 24px 48px !important;
-        font-size: 24px !important;
-        border-radius: 14px !important;
-      }
       model-viewer {
         width: 100vw !important;
-        height: 90vh !important;
+        height: 100vh !important;
         max-width: 100vw !important;
+        max-height: 100vh !important;
         margin: 0 !important;
         padding: 0 !important;
+        display: block !important;
+      }
+
+      #ar-button {
+        bottom: 350px !important;
+        padding: 28px 56px !important;
+        font-size: 28px !important;
+        border-radius: 16px !important;
+        z-index: 999999 !important;
       }
     }
 
