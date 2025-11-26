@@ -131,7 +131,7 @@
   alt="3D Modell eines Siebträgers">
 </model-viewer>
 
-<button id="ar-button">👉 In AR ansehen</button>
+<button id="ar-button">In AR ansehen</button>
 
 <div class="fallback" id="fallback">
   ⚠️ Das 3D-Modell konnte nicht geladen werden.
@@ -139,7 +139,7 @@
 
 <div id="qr-overlay">
   <div id="qr-box">
-    <h2>Mit Handy scannen für AR</h2>
+    <h2>Scanne den QR-Code für die AR ansicht</h2>
     <img id="qr-image" src="">
     <br><br>
     <button onclick="qrOverlay.style.display='none'">Schließen</button>
@@ -154,7 +154,7 @@
   const qrOverlay = document.getElementById('qr-overlay');
   const qrImage = document.getElementById('qr-image');
 
-  const mobileARUrl = "https://DEINE-DOMAIN.de/3d/siebtraeger.html";
+  const mobileARUrl = "https://illumio3d.github.io/AR-Viewer-Machine/";
 
   /* QR-Code generieren über stabile API */
   qrImage.src =
