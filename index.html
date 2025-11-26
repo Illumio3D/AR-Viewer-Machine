@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Siebträger 3D-Ansicht</title>
 
-  <!-- Model Viewer einbinden -->
+  <!-- Model Viewer -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
 
@@ -19,7 +19,7 @@
       color: white;
       font-family: Arial, sans-serif;
       position: relative;
-      overflow-x: hidden; /* verhindert horizontalen Scrollbalken */
+      overflow-x: hidden;
     }
 
     model-viewer {
@@ -29,7 +29,55 @@
       background-color: transparent;
     }
 
-    /* Ladeanzeige & Fallback zentriert */
+    /* Blauer Button (dein Style) */
+    #ar-button {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      background: #0D2C57;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      transition: all 0.2s ease;
+      z-index: 10000;
+    }
+
+    #ar-button:hover {
+      background: #ffcc00;
+      transform: translateX(-50%) scale(1.04);
+    }
+
+    #ar-button:active {
+      transform: translateX(-50%) scale(0.98);
+    }
+
+    /* Loader */
+    #overlay-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffffff;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.4s ease;
+    }
+
+    #overlay-loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Fallback */
     .fallback {
       display: none;
       position: absolute;
@@ -42,97 +90,93 @@
       z-index: 10;
     }
 
-    /* Overlay gegen Flackern/Balken beim Laden */
-    #overlay-loader {
+    /* QR Code Overlay */
+    #qr-overlay {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #ffffff; /*---Farbe loader hintergrund---*/
-      z-index: 9999;
-      display: flex;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
       justify-content: center;
       align-items: center;
-      transition: opacity 0.4s ease;
+      z-index: 99999;
     }
 
-    #overlay-loader.hidden {
-      opacity: 0;
-      pointer-events: none;
+    #qr-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
     }
-      
-      #ar-button {
-          position: absolute;
-          bottom: 16px;
-          left: 50%;
-          transform: translateX(-50%);
 
-          padding: 12px 24px;
-          background: #0D2C57;
-          color: #ffffff;
-          font-size: 16px;
-          font-weight: 600;
-
-          border: none;
-          border-radius: 8px;
-
-          cursor: pointer;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-
-          transition: all 0.2s ease;
-      }
-
-      #ar-button:hover {
-          background: #ffcc00;
-          transform: translateX(-50%) scale(1.04);
-      }
-
-      #ar-button:active {
-          transform: translateX(-50%) scale(0.98);
-      }
-      
+    #qr-box img {
+      width: 260px;
+      height: 260px;
+    }
   </style>
 </head>
 <body>
-  <!-- Overlay mit Ladeanzeige -->
+
+  <!-- Loader -->
   <div id="overlay-loader">
     <div id="loader">🔄 Wird geladen...</div>
   </div>
 
-  <!-- Model Viewer (kann auto-rotate beinhalten.)-->
+  <!-- Model Viewer -->
   <model-viewer
     id="viewer"
     src="Maschine.glb"
     ios-src="Maschine.usdz"
-    ar
-    ar-modes="scene-viewer quick-look webxr"
     camera-controls
     shadow-intensity="1"
     exposure="1"
     environment-image="neutral"
-    alt="3D Modell eines Siebträgers"
-  >
-  
-  <button slot="ar-button" id="ar-button">
-      👉 In AR ansehen
-  </button>
-  
+    alt="3D Modell eines Siebträgers">
   </model-viewer>
 
-  <!-- Fallback-Anzeige bei Fehlern -->
+  <!-- Dein eigener AR Button -->
+  <button id="ar-button">In AR ansehen</button>
+
+  <!-- Fallback -->
   <div class="fallback" id="fallback">
     ⚠️ Das 3D-Modell konnte nicht geladen werden.<br />
     Möglicherweise wird dein Browser nicht unterstützt oder die Datei fehlt.
   </div>
 
-  <!-- Steuerung für Ladeverhalten -->
+  <!-- QR Overlay -->
+  <div id="qr-overlay">
+    <div id="qr-box">
+      <h2>Mit Handy scannen für AR</h2>
+      <img id="qr-image" src="">
+      <br><br>
+      <button onclick="document.getElementById('qr-overlay').style.display='none'">
+        Schließen
+      </button>
+    </div>
+  </div>
+
   <script>
     const viewer = document.getElementById('viewer');
     const fallback = document.getElementById('fallback');
     const overlay = document.getElementById('overlay-loader');
+    const arButton = document.getElementById('ar-button');
 
-    viewer.addEventListener('load', () => {
+    const qrOverlay = document.getElementById('qr-overlay');
+    const qrImage = document.getElementById('qr-image');
+
+    // URL zur Handy-AR-Seite - muss noch final geändert werden !!!!
+    const mobileARUrl = "https://illumio3d.github.io/AR-Viewer-Machine/";
+
+    // QR generieren
+    qrImage.src =
+      "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=" +
+      encodeURIComponent(mobileARUrl);
+
+    // Sicheres Model-Loaded Event
+    viewer.addEventListener('model-visibility', () => {
       overlay.classList.add('hidden');
     });
 
@@ -140,6 +184,32 @@
       overlay.style.display = 'none';
       fallback.style.display = 'block';
     });
+
+    // Loader-Fallback falls ein Browser spinnt
+    setTimeout(() => {
+      if (!viewer.modelIsVisible) {
+        overlay.style.display = 'none';
+        fallback.style.display = 'block';
+      }
+    }, 5000);
+
+    // AR-Button Verhalten
+    arButton.addEventListener("click", () => {
+
+      const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // Direkt AR öffnen (Handy)
+        const link = document.createElement("a");
+        link.setAttribute("rel", "ar");
+        link.href = viewer.getAttribute("ios-src");
+        link.click();
+      } else {
+        // Desktop → QR anzeigen
+        qrOverlay.style.display = "flex";
+      }
+    });
   </script>
+
 </body>
 </html>
