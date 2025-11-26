@@ -52,7 +52,7 @@
     }
 
     #ar-button:hover {
-      background: #ffcc00;
+      background: #334868;
       transform: translateX(-50%) scale(1.04);
     }
 
@@ -178,10 +178,7 @@
     const mobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
 
     if (mobile) {
-      const link = document.createElement("a");
-      link.rel = "ar";
-      link.href = viewer.getAttribute("ios-src");
-      link.click();
+      viewer.activateAR();
     } else {
       qrOverlay.style.display = "flex";
     }
