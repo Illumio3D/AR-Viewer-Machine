@@ -56,6 +56,15 @@
       transform: translateX(-50%) scale(1.04);
     }
 
+    @media (max-width: 768px) {
+      #ar-button {
+        bottom: 120px;
+        padding: 16px 32px;
+        font-size: 20px;
+        border-radius: 10px;
+      }
+    }
+
     #overlay-loader {
       position: fixed;
       top: 0;
@@ -124,6 +133,8 @@
   id="viewer"
   src="Maschine.glb"
   ios-src="Maschine.usdz"
+  ar
+  ar-modes="scene-viewer quick-look webxr"
   camera-controls
   environment-image="neutral"
   shadow-intensity="1"
@@ -174,10 +185,18 @@
   });
 
   /* AR Button Logik */
-  arButton.addEventListener("click", () => {
-    const mobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+  // robust mobile detection: touch-capable device + mobile UA
+  const isMobile = (() => {
+    try {
+      return (
+        (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) &&
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+      );
+    } catch (e) { return false; }
+  })();
 
-    if (mobile) {
+  arButton.addEventListener("click", () => {
+    if (isMobile) {
       viewer.activateAR();
     } else {
       qrOverlay.style.display = "flex";
