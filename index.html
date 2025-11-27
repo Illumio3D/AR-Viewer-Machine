@@ -194,6 +194,7 @@
   const arButton = document.getElementById('ar-button');
   const qrOverlay = document.getElementById('qr-overlay');
   const qrImage = document.getElementById('qr-image');
+  arButton.style.display = 'block'; // always show custom AR button
 
   const mobileARUrl = "https://illumio3d.github.io/AR-Viewer-Machine/";
 
@@ -202,10 +203,9 @@
     "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
     encodeURIComponent(mobileARUrl);
 
-  /* Modell wird sichtbar → Loader entfernen & Custom Button anzeigen */
+  /* Modell wird sichtbar → Loader entfernen */
   viewer.addEventListener("model-visibility", () => {
     overlay.classList.add("hidden");
-    arButton.style.display = "block";
   });
 
   /* Fehler → Fallback anzeigen */
@@ -214,6 +214,33 @@
     fallback.style.display = "block";
   });
 
+  // Hide original model-viewer AR UI elements inside shadow DOM (visual only)
+  function hideOriginalARButtons() {
+    try {
+      const root = viewer.shadowRoot;
+      if (!root) return;
+      const candidates = root.querySelectorAll('.ar-button, .icon, .quick-look-button, button[slot="ar-button"]');
+      candidates.forEach(el => {
+        el.style.opacity = '0';
+        el.style.visibility = 'hidden';
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = '0';
+      });
+    } catch (e) {
+      // swallow errors
+    }
+  }
+
+  viewer.addEventListener('load', () => {
+    // run once after the component has upgraded
+    hideOriginalARButtons();
+  });
+
+  // also try hiding when the shadow DOM mutates (covers dynamic updates)
+  const observer = new MutationObserver(() => hideOriginalARButtons());
+  try {
+    if (viewer.shadowRoot) observer.observe(viewer.shadowRoot, { childList: true, subtree: true });
+  } catch (e) {}
 
   /* AR Button Logik */
   const isMobile = (() => {
@@ -227,6 +254,22 @@
 
   arButton.addEventListener("click", () => {
     if (isMobile) {
+      // On iOS, avoid triggering Quick Look directly which can sometimes cause reloads.
+      try {
+        const ua = navigator.userAgent || '';
+        if (/iPhone|iPad|iPod/i.test(ua)) {
+          // remove quick-look from ar-modes temporarily
+          const current = viewer.getAttribute('ar-modes') || '';
+          const modes = current.split(/\s+/).filter(Boolean).filter(m => m !== 'quick-look');
+          viewer.setAttribute('ar-modes', modes.join(' '));
+          // small delay to let attribute apply
+          setTimeout(() => viewer.activateAR(), 80);
+          // restore full modes after a short delay (so future interactions still work)
+          setTimeout(() => viewer.setAttribute('ar-modes', current), 2000);
+          return;
+        }
+      } catch (e) {}
+
       viewer.activateAR();
     } else {
       qrOverlay.style.display = "flex";
