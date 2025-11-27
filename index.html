@@ -19,7 +19,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: 100svh;
       font-family: Arial, sans-serif;
       position: relative;
       overflow: hidden;
@@ -83,7 +83,7 @@
 
       model-viewer {
         width: 100vw !important;
-        height: 100vh !important;
+        height: 100svh !important;
         max-width: 100vw !important;
         max-height: 100vh !important;
         margin: 0 !important;
@@ -211,17 +211,8 @@
     fallback.style.display = "block";
   });
 
-  /* Originale AR-Buttons im Shadow DOM deaktivieren */
   viewer.addEventListener("load", () => {
-    const arElements = viewer.shadowRoot.querySelectorAll(
-      ".ar-button, .icon, .quick-look-button"
-    );
-    arElements.forEach(el => {
-      el.style.display = "none";
-      el.style.visibility = "hidden";
-      el.style.opacity = "0";
-      el.style.pointerEvents = "none";
-    });
+    viewer.removeAttribute("ar");
   });
 
   /* AR Button Logik */
