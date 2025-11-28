@@ -16,24 +16,37 @@
       --fallback-text-color: #000000;
     }
 
-    body {
-      margin: 0;
-      background: transparent;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      position: relative;
-      overflow: hidden;
-    }
+      body {
+        margin: 0;
+        background: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+        position: relative;
+        overflow: hidden;
+      }
 
-    model-viewer {
-      width: 100%;
-      max-width: 800px;
-      height: 600px;
-      background: transparent;
-    }
+
+      /* Container für das „Fenster“ */
+      #viewer-wrapper {
+        width: 90vw;
+        height: 85vh;
+        max-width: 900px;
+        max-height: 900px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      model-viewer {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+      }
+
 
     /* Originale AR-Buttons deaktivieren (sichtbar) */
     model-viewer::part(ar-button),
@@ -74,26 +87,28 @@
       transform: translateX(-50%) scale(1.04);
     }
 
-    /* Mobile Custom Button (entschärft) */
-    @media (pointer: coarse) {
-      #ar-button {
-        bottom: 400px;
-        padding: 24px 48px;
-        font-size: 24px;
-        border-radius: 16px;
-        z-index: 1500;
+      @media (pointer: coarse) {
+        #ar-button {
+          bottom: 400px;
+          padding: 24px 48px;
+          font-size: 24px;
+          border-radius: 16px;
+          z-index: 1500;
+        }
+
+        #viewer-wrapper {
+          width: 90vw;
+          height: 80vh;
+          max-width: none;
+          max-height: none;
+        }
+
+        model-viewer {
+          width: 100%;
+          height: 100%;
+        }
       }
 
-      model-viewer {
-        width: 100vw;
-        height: 100%;
-        max-width: 100vw;
-        max-height: 100%;
-        margin: 0;
-        padding: 0;
-        display: block;
-      }
-    }
 
     #overlay-loader {
       position: fixed;
@@ -157,20 +172,23 @@
 </head>
 <body>
 
-<div id="overlay-loader">🔄 Wird geladen...</div>
+    <div id="overlay-loader">🔄 Wird geladen...</div>
 
-<model-viewer
-  id="viewer"
-  src="Maschine.glb"
-  ios-src="Maschine.usdz"
-  ar
-  ar-modes="scene-viewer quick-look webxr"
-  camera-controls
-  environment-image="neutral"
-  shadow-intensity="1"
-  exposure="1"
-  alt="3D Modell eines Siebträgers">
-</model-viewer>
+    <div id="viewer-wrapper">
+      <model-viewer
+        id="viewer"
+        src="Maschine.glb"
+        ios-src="Maschine.usdz"
+        ar
+        ar-modes="scene-viewer quick-look webxr"
+        camera-controls
+        environment-image="neutral"
+        shadow-intensity="1"
+        exposure="1"
+        alt="3D Modell eines Siebträgers">
+      </model-viewer>
+    </div>
+
 
 <button id="ar-button">In AR ansehen</button>
 
@@ -269,4 +287,3 @@
 
 </body>
 </html>
-
