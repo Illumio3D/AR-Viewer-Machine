@@ -35,7 +35,7 @@
       background: transparent;
     }
 
-    /* Originale AR-Buttons deaktivieren */
+    /* Originale AR-Buttons deaktivieren (sichtbar) */
     model-viewer::part(ar-button),
     button[slot="ar-button"],
     model-viewer > button,
@@ -74,24 +74,24 @@
       transform: translateX(-50%) scale(1.04);
     }
 
-    /* Mobile Custom Button */
+    /* Mobile Custom Button (entschärft) */
     @media (pointer: coarse) {
       #ar-button {
-        bottom: 400px !important; /* höher */
-        padding: 32px 64px !important; /* größer */
-        font-size: 32px !important;
-        border-radius: 20px !important;
-        z-index: 999999 !important;
+        bottom: 400px;
+        padding: 24px 48px;
+        font-size: 24px;
+        border-radius: 16px;
+        z-index: 1500;
       }
 
       model-viewer {
-        width: 100vw !important;
-        height: 100% !important;
-        max-width: 100vw !important;
-        max-height: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        display: block !important;
+        width: 100vw;
+        height: 100%;
+        max-width: 100vw;
+        max-height: 100%;
+        margin: 0;
+        padding: 0;
+        display: block;
       }
     }
 
@@ -183,7 +183,7 @@
     <h2>Scanne den QR-Code für die AR Ansicht</h2>
     <img id="qr-image" src="">
     <br><br>
-    <button onclick="qrOverlay.style.display='none'">Schließen</button>
+    <button id="qr-close">Schließen</button>
   </div>
 </div>
 
@@ -194,7 +194,9 @@
   const arButton = document.getElementById('ar-button');
   const qrOverlay = document.getElementById('qr-overlay');
   const qrImage = document.getElementById('qr-image');
-  arButton.style.display = 'block'; // always show custom AR button
+  const qrClose = document.getElementById('qr-close');
+
+  arButton.style.display = 'block'; // Custom AR Button immer anzeigen
 
   const mobileARUrl = "https://illumio3d.github.io/AR-Viewer-Machine/";
 
@@ -214,7 +216,7 @@
     fallback.style.display = "block";
   });
 
-  // Hide original model-viewer AR UI elements inside shadow DOM (visual only)
+  // Originale AR-Buttons im Shadow DOM visuell ausblenden (nur einmal)
   function hideOriginalARButtons() {
     try {
       const root = viewer.shadowRoot;
@@ -227,20 +229,13 @@
         el.style.zIndex = '0';
       });
     } catch (e) {
-      // swallow errors
+      // Fehler ignorieren
     }
   }
 
   viewer.addEventListener('load', () => {
-    // run once after the component has upgraded
     hideOriginalARButtons();
   });
-
-  // also try hiding when the shadow DOM mutates (covers dynamic updates)
-  const observer = new MutationObserver(() => hideOriginalARButtons());
-  try {
-    if (viewer.shadowRoot) observer.observe(viewer.shadowRoot, { childList: true, subtree: true });
-  } catch (e) {}
 
   /* AR Button Logik */
   const isMobile = (() => {
@@ -254,28 +249,24 @@
 
   arButton.addEventListener("click", () => {
     if (isMobile) {
-      // On iOS, avoid triggering Quick Look directly which can sometimes cause reloads.
+      // Vereinfachte Logik: auf Mobile direkt AR starten
       try {
-        const ua = navigator.userAgent || '';
-        if (/iPhone|iPad|iPod/i.test(ua)) {
-          // remove quick-look from ar-modes temporarily
-          const current = viewer.getAttribute('ar-modes') || '';
-          const modes = current.split(/\s+/).filter(Boolean).filter(m => m !== 'quick-look');
-          viewer.setAttribute('ar-modes', modes.join(' '));
-          // small delay to let attribute apply
-          setTimeout(() => viewer.activateAR(), 80);
-          // restore full modes after a short delay (so future interactions still work)
-          setTimeout(() => viewer.setAttribute('ar-modes', current), 2000);
-          return;
-        }
-      } catch (e) {}
-
-      viewer.activateAR();
+        viewer.activateAR();
+      } catch (e) {
+        // Fallback: wenn AR nicht gestartet werden kann, QR anzeigen
+        qrOverlay.style.display = "flex";
+      }
     } else {
+      // Desktop: QR-Overlay anzeigen
       qrOverlay.style.display = "flex";
     }
+  });
+
+  qrClose.addEventListener("click", () => {
+    qrOverlay.style.display = "none";
   });
 </script>
 
 </body>
 </html>
+
