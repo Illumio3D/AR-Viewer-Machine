@@ -117,6 +117,20 @@ Without access to previous agent session logs or documented issue descriptions, 
 2. **If the model is not loading:** Add explicit Draco decoder configuration
 3. **For future issues:** Document all fixes in commit messages and/or in a CHANGELOG.md file
 
+## Update: Current Deployment Issue (January 6, 2026)
+
+The user reported a 404 error when accessing the site at `https://three-dimensions.de/`:
+```
+Failed to load resource: the server responded with a status of 404 (Not Found) (Maschine.glb, line 0)
+```
+
+**This is NOT a Draco decoder issue** - it's a deployment issue. The diagnosis:
+- The `Maschine.glb` file (50MB) exists in the GitHub repository
+- The file is not being served from `https://three-dimensions.de/Maschine.glb`
+- This indicates the file wasn't uploaded to the web server, or the hosting provider is blocking large files
+
+**Solution:** Ensure `Maschine.glb` (50MB) and `Maschine.usdz` (19MB) are properly uploaded to the web hosting server. Test by directly accessing `https://three-dimensions.de/Maschine.glb` in a browser.
+
 ## References
 
 - [Model Viewer Documentation](https://modelviewer.dev/docs/)
